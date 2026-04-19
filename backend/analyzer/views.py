@@ -1,5 +1,25 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .models import PatientProfile
+from django.http import JsonResponse
+
+def search_patient(request, patient_id):
+    try:
+        patient = PatientProfile.objects.get(patient_id=patient_id)
+
+        return JsonResponse({
+            "patient_id": patient.patient_id,
+            "name": patient.name,
+            "genes": {
+                "UGT1A1": patient.UGT1A1,
+                "CYP2D6": patient.CYP2D6,
+                "ACE": patient.ACE,
+                "CYP3A5": patient.CYP3A5
+            }
+        })
+
+    except PatientProfile.DoesNotExist:
+        return JsonResponse({"error": "Patient not found"}, status=404)
 
 @api_view(['POST'])
 def analyze_patient(request):
